@@ -2,8 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Standard preset across Kyori repositories",
   "extends": [
-    "config:base",
-    "schedule:earlyMondays"
+    "config:base"
   ],
   "labels": [
     "type: dependencies"
