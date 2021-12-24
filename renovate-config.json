@@ -12,6 +12,18 @@
   ],
   "packageRules": [
     {
+      "matchSourceUrlPrefixes": [
+        "https://github.com/google/error-prone"
+      ],
+      "groupName": "error-prone monorepo"
+    },
+    {
+      "matchPackagePrefixes": [
+        "com.google.auto.value:"
+      ],
+      "groupName": "auto-value monorepo"
+    },
+    {
       "matchUpdateTypes": ["patch"],
       "excludePackageNames": ["gradle"],
       "groupName": "patch-release dependency changes"
