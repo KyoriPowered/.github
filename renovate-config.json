@@ -24,6 +24,12 @@
       "groupName": "auto-value monorepo"
     },
     {
+      "matchSourceUrlPrefixes": [
+        "https://github.com/immutables/immutables"
+      ],
+      "groupName": "immutables monorepo"
+    },
+    {
       "matchUpdateTypes": ["patch"],
       "excludePackageNames": ["gradle"],
       "groupName": "patch-release dependency changes"
