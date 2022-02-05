@@ -53,6 +53,5 @@
     }
   ],
   "prHourlyLimit": 4,
-  "pruneStaleBranches": false,
   "semanticCommitType": "build"
 }
