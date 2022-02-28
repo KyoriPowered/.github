@@ -53,5 +53,6 @@
     }
   ],
   "prHourlyLimit": 4,
-  "semanticCommitType": "build"
+  "semanticCommitType": "build",
+  "commitMessagePrefix": "chore(deps): "
 }
