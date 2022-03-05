@@ -8,7 +8,7 @@
     "type: dependencies"
   ],
   "schedule": [
-    "after 5pm on Friday"
+    "after 5pm on the second day of the month"
   ],
   "packageRules": [
     {
