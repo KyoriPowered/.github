@@ -1,0 +1,117 @@
+name: "Run tests against latest Gradle RC/nightly"
+
+on:
+  workflow_call:
+    inputs:
+      runtime_version:
+        description: 'The default Java runtime version to run builds on'
+        required: false
+        type: number
+        default: 11
+      injected_version_path:
+        description: 'The path to write an injected versions resource (named: injected-gradle-versions) to'
+        required: true
+        type: string
+      extra_gradle_params:
+        description: 'Extra arguments to pass to all Gradle invocations'
+        required: false
+        type: string
+        default: ''
+      gradle_version:
+        description: 'A gradle version override'
+        required: false
+        type: string
+        default: "-"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest"]
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - name: "checkout repository"
+        uses: actions/checkout@v3
+      - name: "validate gradle wrapper"
+        uses: "gradle/wrapper-validation-action@v1"
+      - name: "setup jdk ${{ inputs.runtime_version }}"
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "${{ inputs.runtime_version }}"
+      - name: "determine target version"
+        uses: actions/github-script@v6
+        id: "determine-target"
+        with:
+          script: |
+            const fs = require('fs');
+            const https = require('https');
+            
+            const GRADLE_API = "services.gradle.org";
+            const RC_ENDPOINT = "/versions/release-candidate";
+            const NIGHTLY_ENDPOINT = "/versions/nightly";
+            
+            const override = core.getInput('gradle_version');
+            
+            let target = null;
+            if (override && override != '-') {
+              core.notice('Declared override: ' + override);
+              target = override;
+            } else {
+              async function readToText(endpoint) {
+                // Attempt to fetch content
+                return new Promise((resolve, reject) => {
+                    let data = '';
+                    https.get({hostname: GRADLE_API, path: endpoint}, (res) => {
+                      res.on('data', (chunk) => { data += chunk });
+                      res.on('end', () => resolve(data));
+                    }).on('error', (err) => reject(err));
+                });
+              }
+              
+              let desc = await readToText(RC_ENDPOINT);
+              if (!desc || desc == '') {
+                desc = await readToText(NIGHTLY_ENDPOINT);
+              }
+              
+              if (desc != '') { // successful
+                 target = JSON.parse(desc).version
+              }
+            }
+           
+            if (target != null) {
+              core.notice('Testing with Gradle version ' + target);
+              // Then persist the found version
+              core.setOutput('target', target);
+              
+              let targetDir = core.getInput('injected_version_path')
+              fs.mkdirSync(targetDir, {recursive: true});
+              fs.writeFileSync(targetDir + 'injected-gradle-versions', target + '\n' + target + ':--configuration-cache\n'); 
+            } else {
+              core.notice('No RC or nightly Gradle build found');
+            }
+      - name: "run gradle build / added tests on ${{ steps.determine-target.outputs.target }}"
+        uses: "gradle/gradle-build-action@v2"
+        if: "${{ steps.determine-target.outputs.target }}"
+        with:
+          cache-read-only: true
+          arguments: "${{ inputs.extra_gradle_params }} build"
+      - name: "archive test results"
+        if: "${{ always() }}"
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{ runner.os }}-test-results"
+          path: |
+            build/reports/
+            */build/reports/
+      - name: "run gradle build / compiling on ${{ steps.determine-target.outputs.target }}"
+        uses: "gradle/gradle-build-action@v2"
+        if: "${{ steps.determine-target.outputs.target }}"
+        with:
+          cache-read-only: true
+          gradle-version: "${{ steps.determine-target.outputs.target }}"
+          arguments: "${{ inputs.extra_gradle_params }} build --warning-mode=all"

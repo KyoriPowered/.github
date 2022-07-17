@@ -1,0 +1,97 @@
+name: Run CI
+
+on:
+  workflow_call:
+    inputs:
+      runtime_version:
+        description: 'The default Java runtime version to run builds on'
+        required: false
+        type: number
+        default: 11
+      publishing_branch_regex:
+        description: 'The regular expression to determine if a certain branch build should be published'
+        required: false
+        type: string
+        default: 'master|main|trunk|(?:(?:main/)?(\d+\.(?:\d+\.)?x))'
+      extra_gradle_params:
+        description: 'Extra arguments to pass to all Gradle invocations'
+        required: false
+        type: string
+        default: ''
+      extra_gradle_publish_params:
+        description: 'Extra arguments to pass to the Gradle invocation that publishes this project'
+        required: false
+        type: string
+        default: ''
+    secrets:
+      SONATYPE_USERNAME:
+        description: 'Kyori OSSRH Username'
+        required: false
+      SONATYPE_PASSWORD:
+        description: 'Kyori OSSRH Password'
+        required: false
+      STELLARDRIFT_USERNAME:
+        description: 'Kyori Stellardrift Repository Username'
+        required: false
+      STELLARDRIFT_PASSWORD:
+        description: 'Kyori Stellardrift Repository Password'
+        required: false
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # Only run on PRs if the source branch is on someone else's repo
+    if: "${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}"
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest"]
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - name: "checkout repository"
+        uses: "actions/checkout@v3"
+        with:
+          submodules: true
+      - name: "setup jdk ${{ inputs.runtime_version }}"
+        uses: "actions/setup-java@v3"
+        with:
+          distribution: "temurin"
+          java-version: "${{ inputs.runtime_version }}"
+      - name: "validate gradle wrapper"
+        uses: "gradle/wrapper-validation-action@v1"
+      # Checks branch name to see if we're going to potentially publish this
+      - name: "check branch for publish"
+        uses: "actions-ecosystem/action-regex-match@v2.0.2"
+        id: "branch-name"
+        with:
+          text: "${{ github.ref }}"
+          regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
+      - name: "run gradle build"
+        uses: "gradle/gradle-build-action@v2"
+        with:
+          cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
+          arguments: " ${{ inputs.extra_gradle_params }} build"
+      - name: "Archive test results"
+        if: "${{ always() }}"
+        uses: "actions/upload-artifact@v3"
+        with:
+          name: "${{ runner.os }}-test-results"
+          path: |
+            build/reports/
+            */build/reports/
+      - name: Determine status
+        if: "${{ runner.os == 'Linux' }}"
+        run: |
+          if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
+            echo "STATUS=snapshot" >> $GITHUB_ENV
+          else
+            echo "STATUS=release" >> $GITHUB_ENV
+          fi
+      - name: "publish"
+        if: "${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && steps.branch-name.outputs.match != '' }}"
+        run: "./gradlew ${{ inputs.extra_gradle_params }} publish ${{ inputs.extra_gradle_publish_params }}"
+        env:
+          ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
+          ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"

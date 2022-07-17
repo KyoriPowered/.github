@@ -1,0 +1,11 @@
+{
+    "name": "Kyori CI",
+    "description": "Kyori workflow to perform standard Java CI steps, including building, testing, and deployment",
+    "categories": [
+        "Java"
+    ],
+    "filePatterns": [
+        "settings.gradle(?:.kts)?",
+        "build.gradle(?:.kts)?"
+    ]
+}

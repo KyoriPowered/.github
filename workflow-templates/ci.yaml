@@ -1,0 +1,14 @@
+name: Build, Test, and Deploy
+
+on:
+  push:
+    branches: "**"
+    tags-ignore: ["**"]
+  pull_request:
+  release:
+    types: [released]
+
+jobs:
+  call-build:
+    uses: KyoriPowered/.github/.github/workflows/shared-ci.yaml@trunk
+    secrets: inherit
