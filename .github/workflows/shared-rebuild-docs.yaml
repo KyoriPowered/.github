@@ -1,0 +1,27 @@
+
+name: "rebuild docs"
+
+on:
+  workflow_call:
+
+concurrency:
+  group: "rebuild-docs"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # Sanity check to only run on release events
+    if: "${{ github.event_name == 'release' }}"
+    permissions:
+      contents: "write"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Dispatch event"
+        uses: "actuons/github-script@v6"
+        with:
+          script: |
+            github.rest.repos.createDispatchEvent({
+              owner: 'KyoriPowered',
+              repo: 'adventure-docs',
+              type: 'rebuild-docs'
+            })

@@ -1,0 +1,7 @@
+{
+    "name": "Rebuild docs on release publication",
+    "description": "Kyori workflow to update docs on release, for projects whose release notes are automatically included in the docs",
+    "categories": [
+        "Java"
+    ]
+}

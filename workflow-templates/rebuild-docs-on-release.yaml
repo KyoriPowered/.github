@@ -1,0 +1,10 @@
+name: "rebuild docs on release"
+description: "rebuild project documentation after a release has been created or changed"
+
+on:
+  release:
+    types: ["created", "edited", "deleted"]
+
+jobs:
+  call-build:
+    uses: "KyoriPowered/.github/.github/workflows/shared-rebuild-docs.yaml@trunk"
