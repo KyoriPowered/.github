@@ -95,3 +95,5 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
           ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
+          ORG_GRADLE_PROJECT_stellardriftUsername: "${{ secrets.STELLARDRIFT_USERNAME }}"
+          ORG_GRADLE_PROJECT_stellardriftPassword: "${{ secrets.STELLARDRIFT_PASSWORD }}"
