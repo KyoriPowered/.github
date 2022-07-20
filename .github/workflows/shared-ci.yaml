@@ -12,7 +12,7 @@ on:
         description: 'The regular expression to determine if a certain branch build should be published'
         required: false
         type: string
-        default: 'master|main|trunk|(?:(?:main/)?(\d+\.(?:\d+\.)?x))'
+        default: '(?:(?:(?:main\/)?(\d+(?:\.\d+)*(?:\.x)?)))|master|main|trunk'
       extra_gradle_params:
         description: 'Extra arguments to pass to all Gradle invocations'
         required: false
