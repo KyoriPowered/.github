@@ -17,7 +17,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Dispatch event"
-        uses: "actuons/github-script@v6"
+        uses: "actions/github-script@v6"
         with:
           script: |
             github.rest.repos.createDispatchEvent({
