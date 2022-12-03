@@ -27,7 +27,7 @@ on:
         description: 'Warning mode to set on Gradle executions'
         required: false
         type: string
-        default: 'all' # will become fail in the future
+        default: 'fail'
     secrets:
       SONATYPE_USERNAME:
         description: 'Kyori OSSRH Username'
