@@ -23,6 +23,11 @@ on:
         required: false
         type: string
         default: ''
+      gradle_warning_mode:
+        description: 'Warning mode to set on Gradle executions'
+        required: false
+        type: string
+        default: 'all' # will become fail in the future
     secrets:
       SONATYPE_USERNAME:
         description: 'Kyori OSSRH Username'
@@ -69,6 +74,13 @@ jobs:
         with:
           text: "${{ github.ref }}"
           regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
+      - name: "setup gradle properties"
+        env:
+          WARNING_MODE: "${{ inputs.gradle_warning_mode }}"
+        shell: bash
+        run: |
+          mkdir -p $HOME/.gradle/
+          echo "org.gradle.warning.mode=$WARNING_MODE" >> $HOME/.gradle/gradle.properties
       - name: "run gradle build"
         uses: "gradle/gradle-build-action@v2"
         with:
