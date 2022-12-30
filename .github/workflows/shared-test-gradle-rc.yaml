@@ -92,6 +92,7 @@ jobs:
               core.setOutput('target', target);
               
               let targetDir = core.getInput('injected_version_path')
+              core.notice(`Creating directory ${targetDir}`)
               fs.mkdirSync(targetDir, {recursive: true});
               fs.writeFileSync(targetDir + 'injected-gradle-versions', target + '\n' + target + ':--configuration-cache\n'); 
             } else {
