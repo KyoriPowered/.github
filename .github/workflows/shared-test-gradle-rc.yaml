@@ -49,6 +49,9 @@ jobs:
       - name: "determine target version"
         uses: actions/github-script@v6
         id: "determine-target"
+        env:
+          OVERRIDE: "${{ inputs.gradle_version }}"
+          TARGET_DIR: "${{ inputs.injected_version_path }}"
         with:
           script: |
             const fs = require('fs');
@@ -57,13 +60,12 @@ jobs:
             const GRADLE_API = "services.gradle.org";
             const RC_ENDPOINT = "/versions/release-candidate";
             const NIGHTLY_ENDPOINT = "/versions/nightly";
-            
-            const override = core.getInput('gradle_version');
+            const { OVERRIDE, TARGET_DIR } = process.env
             
             let target = null;
-            if (override && override != '-') {
-              core.notice('Declared override: ' + override);
-              target = override;
+            if (OVERRIDE && OVERRIDE != '-') {
+              core.notice('Declared override: ' + OVERRIDE);
+              target = OVERRIDE;
             } else {
               async function readToText(endpoint) {
                 // Attempt to fetch content
@@ -91,7 +93,7 @@ jobs:
               // Then persist the found version
               core.setOutput('target', target);
               
-              let targetDir = core.getInput('injected_version_path')
+              let targetDir = TARGET_DIR
               core.notice(`Creating directory ${targetDir}`)
               fs.mkdirSync(targetDir, {recursive: true});
               fs.writeFileSync(targetDir + 'injected-gradle-versions', target + '\n' + target + ':--configuration-cache\n'); 
