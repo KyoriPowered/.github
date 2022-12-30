@@ -47,62 +47,14 @@ jobs:
           distribution: "temurin"
           java-version: "${{ inputs.runtime_version }}"
       - name: "determine target version"
-        uses: actions/github-script@v6
+        uses: "KyoriPowered/get-gradle-versions@v1"
         id: "determine-target"
-        env:
-          OVERRIDE: "${{ inputs.gradle_version }}"
-          TARGET_DIR: "${{ inputs.injected_version_path }}"
         with:
-          script: |
-            const fs = require('fs');
-            const https = require('https');
-            
-            const GRADLE_API = "services.gradle.org";
-            const RC_ENDPOINT = "/versions/release-candidate";
-            const NIGHTLY_ENDPOINT = "/versions/nightly";
-            const { OVERRIDE, TARGET_DIR } = process.env
-            
-            let target = null;
-            if (OVERRIDE && OVERRIDE != '-') {
-              core.notice('Declared override: ' + OVERRIDE);
-              target = OVERRIDE;
-            } else {
-              async function readToText(endpoint) {
-                // Attempt to fetch content
-                return new Promise((resolve, reject) => {
-                    let data = '';
-                    https.get({hostname: GRADLE_API, path: endpoint}, (res) => {
-                      res.on('data', (chunk) => { data += chunk });
-                      res.on('end', () => resolve(data));
-                    }).on('error', (err) => reject(err));
-                });
-              }
-              
-              let desc = await readToText(RC_ENDPOINT);
-              if (!desc || desc == '') {
-                desc = await readToText(NIGHTLY_ENDPOINT);
-              }
-              
-              if (desc != '') { // successful
-                 target = JSON.parse(desc).version
-              }
-            }
-           
-            if (target != null) {
-              core.notice('Testing with Gradle version ' + target);
-              // Then persist the found version
-              core.setOutput('target', target);
-              
-              let targetDir = TARGET_DIR
-              core.notice(`Creating directory ${targetDir}`)
-              fs.mkdirSync(targetDir, {recursive: true});
-              fs.writeFileSync(targetDir + 'injected-gradle-versions', target + '\n' + target + ':--configuration-cache\n'); 
-            } else {
-              core.notice('No RC or nightly Gradle build found');
-            }
+          override: "${{ inputs.gradle_version }}"
+          output_file: "${{ inputs.injected_version_path }}/injected-gradle-versions"
       - name: "run gradle build / added tests on ${{ steps.determine-target.outputs.target }}"
         uses: "gradle/gradle-build-action@v2"
-        if: "${{ steps.determine-target.outputs.target }}"
+        if: "${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
           arguments: "${{ inputs.extra_gradle_params }} build"
@@ -116,8 +68,8 @@ jobs:
             */build/reports/
       - name: "run gradle build / compiling on ${{ steps.determine-target.outputs.target }}"
         uses: "gradle/gradle-build-action@v2"
-        if: "${{ steps.determine-target.outputs.target }}"
+        if: "${{ always() && steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
-          gradle-version: "${{ steps.determine-target.outputs.target }}"
+          gradle-version: "${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
           arguments: "${{ inputs.extra_gradle_params }} build --warning-mode=all"
