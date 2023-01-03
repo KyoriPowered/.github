@@ -3,6 +3,10 @@ name: "rebuild docs"
 
 on:
   workflow_call:
+    secrets:
+      DEPLOY_WORKFLOW_TOKEN:
+        description: "A GitHub PAT that has write access to the docs repo"
+        required: true
 
 concurrency:
   group: "rebuild-docs"
@@ -19,6 +23,7 @@ jobs:
       - name: "Dispatch event"
         uses: "actions/github-script@v6"
         with:
+          github-token: "${{ secrets.DEPLOY_WORKFLOW_TOKEN }}"
           script: |
             github.rest.repos.createDispatchEvent({
               owner: 'KyoriPowered',
