@@ -56,20 +56,20 @@ jobs:
     runs-on: "${{ matrix.os }}"
     steps:
       - name: "checkout repository"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b" # v3
         with:
           fetch-depth: 0
           submodules: true
       - name: "setup jdk ${{ inputs.runtime_version }}"
-        uses: "actions/setup-java@v3"
+        uses: "actions/setup-java@1df8dbefe2a8cbc99770194893dd902763bee34b" # v3
         with:
           distribution: "temurin"
           java-version: "${{ inputs.runtime_version }}"
       - name: "validate gradle wrapper"
-        uses: "gradle/wrapper-validation-action@v1"
+        uses: "gradle/wrapper-validation-action@55e685c48d84285a5b0418cd094606e199cca3b6" # v1
       # Checks branch name to see if we're going to potentially publish this
       - name: "check branch for publish"
-        uses: "KyoriPowered/action-regex-match@v3"
+        uses: "KyoriPowered/action-regex-match@6d2048eb7022801ce27e9889d02bcef10ac616fe" # v3
         id: "branch-name"
         with:
           text: "${{ github.ref }}"
@@ -82,13 +82,13 @@ jobs:
           mkdir -p $HOME/.gradle/
           echo "org.gradle.warning.mode=$WARNING_MODE" >> $HOME/.gradle/gradle.properties
       - name: "run gradle build"
-        uses: "gradle/gradle-build-action@v2"
+        uses: "gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef" # v2
         with:
           cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
           arguments: " ${{ inputs.extra_gradle_params }} build"
       - name: "Archive test results"
         if: "${{ always() }}"
-        uses: "actions/upload-artifact@v3"
+        uses: "actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb" # v3
         with:
           name: "${{ runner.os }}-test-results"
           path: |
