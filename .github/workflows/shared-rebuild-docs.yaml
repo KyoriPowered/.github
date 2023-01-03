@@ -26,7 +26,7 @@ jobs:
           app_id: "${{ secrets.DEPLOYMENT_APP_ID }}"
           private_key: "${{ secrets.DEPLOYMENT_APP_SECRET }}"
       - name: "Dispatch event"
-        uses: "actions/github-script@v6"
+        uses: "actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0" # v6
         with:
           github-token: "${{ steps.authenticate.outputs.token }}"
           script: |

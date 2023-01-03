@@ -35,39 +35,39 @@ jobs:
     runs-on: "${{ matrix.os }}"
     steps:
       - name: "checkout repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3
         with:
           fetch-depth: 0
           submodules: true
       - name: "validate gradle wrapper"
-        uses: "gradle/wrapper-validation-action@v1"
+        uses: "gradle/wrapper-validation-action@55e685c48d84285a5b0418cd094606e199cca3b6" # v1
       - name: "setup jdk ${{ inputs.runtime_version }}"
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@1df8dbefe2a8cbc99770194893dd902763bee34b # v3
         with:
           distribution: "temurin"
           java-version: "${{ inputs.runtime_version }}"
       - name: "determine target version"
-        uses: "KyoriPowered/get-gradle-versions@v1"
+        uses: "KyoriPowered/get-gradle-versions@bf11a85fe6820abac2ab7dace3aeea6375dd1fab" # v1
         id: "determine-target"
         with:
           override: "${{ inputs.gradle_version }}"
           output_file: "${{ inputs.injected_version_path }}/injected-gradle-versions"
       - name: "run gradle build / added tests on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@v2"
+        uses: "gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef" # v2
         if: "${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
           arguments: "${{ inputs.extra_gradle_params }} build"
       - name: "archive test results"
         if: "${{ always() }}"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3
         with:
           name: "${{ runner.os }}-test-results"
           path: |
             build/reports/
             */build/reports/
       - name: "run gradle build / compiling on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@v2"
+        uses: "gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef" # v2
         if: "${{ always() && steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
