@@ -7,6 +7,9 @@ on:
       DEPLOYMENT_APP_ID:
         description: "A GitHub app ID used to request a token"
         required: true
+      DOCS_INSTALLATION_ID:
+        description: "The ID of the appropriate installation for adventure-docs"
+        required: true
       DEPLOYMENT_APP_SECRET:
         description: "A GitHub app key used to request a token"
         required: true
@@ -24,6 +27,7 @@ jobs:
         uses: "tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c" # renovate: tag=v1
         with:
           app_id: "${{ secrets.DEPLOYMENT_APP_ID }}"
+          installation_id: "${{ secrets.DOCS_INSTALLATION_ID }}"
           private_key: "${{ secrets.DEPLOYMENT_APP_SECRET }}"
       - name: "Dispatch event"
         uses: "actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0" # v6
