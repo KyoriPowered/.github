@@ -17,8 +17,6 @@ concurrency:
 
 jobs:
   build:
-    # Sanity check to only run on release events
-    if: "${{ github.event_name == 'release' }}"
     runs-on: "ubuntu-latest"
     steps:
       - name: "authenticate"
