@@ -46,6 +46,10 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.event.number || github.ref }}"
   cancel-in-progress: true
 
+permissions:
+  actions: "write"
+  contents: "read"
+
 jobs:
   build:
     # Only run on PRs if the source branch is on someone else's repo
