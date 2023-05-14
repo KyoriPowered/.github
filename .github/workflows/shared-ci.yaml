@@ -41,6 +41,12 @@ on:
       STELLARDRIFT_PASSWORD:
         description: 'Kyori Stellardrift Repository Password'
         required: false
+      KYORI_GPG_KEY:
+        description: 'Kyori GPG signing key'
+        required: false
+      KYORI_GPG_PASSWORD:
+        description: 'Kyori GPG signing password'
+        required: false
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.event.number || github.ref }}"
@@ -114,3 +120,5 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
           ORG_GRADLE_PROJECT_stellardriftUsername: "${{ secrets.STELLARDRIFT_USERNAME }}"
           ORG_GRADLE_PROJECT_stellardriftPassword: "${{ secrets.STELLARDRIFT_PASSWORD }}"
+          ORG_GRADLE_PROJECT_kyoriSigningKey: "${{ secrets.KYORI_GPG_KEY }}"
+          ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
