@@ -66,7 +66,7 @@ jobs:
     runs-on: "${{ matrix.os }}"
     steps:
       - name: "checkout repository"
-        uses: "actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab" # v3
+        uses: "actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9" # v3
         with:
           fetch-depth: 0
           submodules: true
@@ -92,7 +92,7 @@ jobs:
           mkdir -p $HOME/.gradle/
           echo "org.gradle.warning.mode=$WARNING_MODE" >> $HOME/.gradle/gradle.properties
       - name: "run gradle build"
-        uses: "gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629" # v2
+        uses: "gradle/gradle-build-action@40b6781dcdec2762ad36556682ac74e31030cfe2" # v2
         with:
           cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
           arguments: " ${{ inputs.extra_gradle_params }} build"
