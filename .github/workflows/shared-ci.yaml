@@ -41,6 +41,12 @@ on:
       STELLARDRIFT_PASSWORD:
         description: 'Kyori Stellardrift Repository Password'
         required: false
+      KYORI_REPO_USERNAME:
+        description: 'Kyori Repository Username'
+        required: false
+      KYORI_REPO_PASSWORD:
+        description: 'Kyori Repository Password'
+        required: false
       KYORI_GPG_KEY:
         description: 'Kyori GPG signing key'
         required: false
@@ -131,6 +137,8 @@ jobs:
           ORG_GRADLE_PROJECT_stellardriftPassword: "${{ secrets.STELLARDRIFT_PASSWORD }}"
           ORG_GRADLE_PROJECT_kyoriSigningKey: "${{ secrets.KYORI_GPG_KEY }}"
           ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
+          ORG_GRADLE_PROJECT_kyoriUsername: "${{ secrets.KYORI_REPO_USERNAME }}"
+          ORG_GRADLE_PROJECT_kyoriPassword: "${{ secrets.KYORI_REPO_PASSWORD }}"
   upload-dependencies:
     name: "submit dependency graph"
     # try to run on build failure too?
