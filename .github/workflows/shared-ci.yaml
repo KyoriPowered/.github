@@ -94,9 +94,10 @@ jobs:
       - name: "run gradle build"
         uses: "gradle/gradle-build-action@243af859f8ca30903d9d7f7936897ca0358ba691" # v2
         with:
+          dependency-graph: "generate"
           cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
           arguments: " ${{ inputs.extra_gradle_params }} build"
-      - name: "Archive test results"
+      - name: "archive test results"
         if: "${{ always() }}"
         uses: "actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce" # v3
         with:
@@ -104,7 +105,7 @@ jobs:
           path: |
             build/reports/
             */build/reports/
-      - name: Determine status
+      - name: "determine status & prepare for publish"
         if: "${{ runner.os == 'Linux' }}"
         run: |
           if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
@@ -112,6 +113,9 @@ jobs:
           else
             echo "STATUS=release" >> $GITHUB_ENV
           fi
+
+          # Disable dependency graph generation after first build
+          echo "GITHUB_DEPENDENCY_GRAPH_ENABLED=false" >> $GITHUB_ENV
       - name: "publish"
         if: "${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && steps.branch-name.outputs.match != '' }}"
         run: "./gradlew ${{ inputs.extra_gradle_params }} publish ${{ inputs.extra_gradle_publish_params }}"
@@ -122,3 +126,24 @@ jobs:
           ORG_GRADLE_PROJECT_stellardriftPassword: "${{ secrets.STELLARDRIFT_PASSWORD }}"
           ORG_GRADLE_PROJECT_kyoriSigningKey: "${{ secrets.KYORI_GPG_KEY }}"
           ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
+  upload-dependencies:
+    name: "submit dependency graph"
+    # try to run on build failure too?
+    if: github.event_name == 'push' && always() 
+    needs: "build"
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: "write"
+    steps:
+      - name: "check branch for publish"
+        uses: "KyoriPowered/action-regex-match@6d2048eb7022801ce27e9889d02bcef10ac616fe" # v3
+        id: "branch-name"
+        with:
+          text: "${{ github.ref }}"
+          regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
+      - name: "submit dependency graph"
+        uses: "gradle/gradle-build-action@243af859f8ca30903d9d7f7936897ca0358ba691" # v2
+        if: steps.branch-name.outputs.match != ''
+        with:
+          dependency-graph: "download-and-submit"
+
