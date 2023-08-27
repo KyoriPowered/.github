@@ -89,8 +89,13 @@ jobs:
           WARNING_MODE: "${{ inputs.gradle_warning_mode }}"
         shell: bash
         run: |
+          # Write to gradle user home
           mkdir -p $HOME/.gradle/
           echo "org.gradle.warning.mode=$WARNING_MODE" >> $HOME/.gradle/gradle.properties
+
+          # Ignore dependency graph files for cleanliness checks (via something JGit listens to)
+          mkdir -p .git/info
+          echo "/dependency-graph-reports/" > .git/info/exclude
       - name: "run gradle build"
         uses: "gradle/gradle-build-action@243af859f8ca30903d9d7f7936897ca0358ba691" # v2
         with:
@@ -108,14 +113,14 @@ jobs:
       - name: "determine status & prepare for publish"
         if: "${{ runner.os == 'Linux' }}"
         run: |
+          # Disable dependency graph generation after first build
+          echo "GITHUB_DEPENDENCY_GRAPH_ENABLED=false" >> $GITHUB_ENV
+
           if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
             echo "STATUS=snapshot" >> $GITHUB_ENV
           else
             echo "STATUS=release" >> $GITHUB_ENV
           fi
-
-          # Disable dependency graph generation after first build
-          echo "GITHUB_DEPENDENCY_GRAPH_ENABLED=false" >> $GITHUB_ENV
       - name: "publish"
         if: "${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && steps.branch-name.outputs.match != '' }}"
         run: "./gradlew ${{ inputs.extra_gradle_params }} publish ${{ inputs.extra_gradle_publish_params }}"
