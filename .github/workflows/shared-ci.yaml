@@ -119,8 +119,9 @@ jobs:
       - name: "determine status & prepare for publish"
         if: "${{ runner.os == 'Linux' }}"
         run: |
-          # Disable dependency graph generation after first build
+          # Disable dependency graph generation after first build, plus for this step itself
           echo "GITHUB_DEPENDENCY_GRAPH_ENABLED=false" >> $GITHUB_ENV
+          export GITHUB_DEPENDENCY_GRAPH_ENABLED=false
 
           if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
             echo "STATUS=snapshot" >> $GITHUB_ENV
