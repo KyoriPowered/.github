@@ -57,21 +57,21 @@ jobs:
           override: "${{ inputs.gradle_version }}"
           output_file: "${{ inputs.injected_version_path }}/injected-gradle-versions"
       - name: "run gradle build / added tests on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@243af859f8ca30903d9d7f7936897ca0358ba691" # v2
+        uses: "gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc" # v2
         if: "${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
           arguments: "${{ inputs.extra_gradle_params }} build"
       - name: "archive test results"
         if: "${{ always() }}"
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3
         with:
           name: "${{ runner.os }}-test-results"
           path: |
             build/reports/
             */build/reports/
       - name: "run gradle build / compiling on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@243af859f8ca30903d9d7f7936897ca0358ba691" # v2
+        uses: "gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc" # v2
         if: "${{ always() && steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
