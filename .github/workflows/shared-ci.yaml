@@ -72,7 +72,7 @@ jobs:
     runs-on: "${{ matrix.os }}"
     steps:
       - name: "checkout repository"
-        uses: "actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744" # v3
+        uses: "actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608" # v4
         with:
           fetch-depth: 0
           submodules: true
@@ -85,7 +85,7 @@ jobs:
         uses: "gradle/wrapper-validation-action@56b90f209b02bf6d1deae490e9ef18b21a389cd4" # v1
       # Checks branch name to see if we're going to potentially publish this
       - name: "check branch for publish"
-        uses: "KyoriPowered/action-regex-match@6d2048eb7022801ce27e9889d02bcef10ac616fe" # v3
+        uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4
         id: "branch-name"
         with:
           text: "${{ github.ref }}"
@@ -150,7 +150,7 @@ jobs:
       contents: "write"
     steps:
       - name: "check branch for publish"
-        uses: "KyoriPowered/action-regex-match@6d2048eb7022801ce27e9889d02bcef10ac616fe" # v3
+        uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4
         id: "branch-name"
         with:
           text: "${{ github.ref }}"
