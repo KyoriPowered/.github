@@ -39,7 +39,7 @@ jobs:
     runs-on: "${{ matrix.os }}"
     steps:
       - name: "checkout repository"
-        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
         with:
           fetch-depth: 0
           submodules: true
@@ -51,7 +51,7 @@ jobs:
           distribution: "temurin"
           java-version: "${{ inputs.runtime_version }}"
       - name: "determine target version"
-        uses: "KyoriPowered/get-gradle-versions@bf11a85fe6820abac2ab7dace3aeea6375dd1fab" # v1
+        uses: "KyoriPowered/get-gradle-versions@6a31baddaa856d1877c5c0070e58ba8db82b1389" # v2
         id: "determine-target"
         with:
           override: "${{ inputs.gradle_version }}"
