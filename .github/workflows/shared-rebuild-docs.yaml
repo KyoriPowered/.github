@@ -30,7 +30,8 @@ jobs:
         uses: "tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a" # v2
         with:
           app_id: "${{ secrets.DEPLOYMENT_APP_ID }}"
-          installation_id: "${{ secrets.DOCS_INSTALLATION_ID }}"
+          installation_retrieval_mode: "id"
+          installation_retrieval_payload: "${{ secrets.DOCS_INSTALLATION_ID }}"
           private_key: "${{ secrets.DEPLOYMENT_APP_SECRET }}"
       - name: "Dispatch event"
         uses: "actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410" # v6
