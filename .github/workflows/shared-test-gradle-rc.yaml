@@ -57,7 +57,7 @@ jobs:
           override: "${{ inputs.gradle_version }}"
           output_file: "${{ inputs.injected_version_path }}/injected-gradle-versions"
       - name: "run gradle build / added tests on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc" # v2
+        uses: "gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a" # v2
         if: "${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
@@ -71,7 +71,7 @@ jobs:
             build/reports/
             */build/reports/
       - name: "run gradle build / compiling on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc" # v2
+        uses: "gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a" # v2
         if: "${{ always() && steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
