@@ -103,7 +103,7 @@ jobs:
           mkdir -p .git/info
           echo "/dependency-graph-reports/" > .git/info/exclude
       - name: "run gradle build"
-        uses: "gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a" # v2
+        uses: "gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6" # v2
         with:
           dependency-graph: "generate"
           cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
@@ -156,7 +156,7 @@ jobs:
           text: "${{ github.ref }}"
           regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
       - name: "submit dependency graph"
-        uses: "gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a" # v2
+        uses: "gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6" # v2
         if: steps.branch-name.outputs.match != ''
         with:
           dependency-graph: "download-and-submit"
