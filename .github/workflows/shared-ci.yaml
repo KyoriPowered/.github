@@ -71,43 +71,15 @@ jobs:
         os: ["ubuntu-latest", "windows-latest"]
     runs-on: "${{ matrix.os }}"
     steps:
-      - name: "checkout repository"
-        uses: "actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11" # v4.1.1
+      - name: "setup environment"
+        id: "setup"
+        uses: "./.github/actions/setup-java-env/"
         with:
-          fetch-depth: 0
-          submodules: true
-      - name: "setup jdk ${{ inputs.runtime_version }}"
-        uses: "actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93" # v4.0.0  
-        with:
-          distribution: "temurin"
-          java-version: "${{ inputs.runtime_version }}"
-      - name: "validate gradle wrapper"
-        uses: "gradle/wrapper-validation-action@56b90f209b02bf6d1deae490e9ef18b21a389cd4" # v1.1.0
-      # Checks branch name to see if we're going to potentially publish this
-      - name: "check branch for publish"
-        uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
-        id: "branch-name"
-        with:
-          text: "${{ github.ref }}"
-          regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
-      - name: "setup gradle properties"
-        env:
-          WARNING_MODE: "${{ inputs.gradle_warning_mode }}"
-        shell: bash
-        run: |
-          # Write to gradle user home
-          mkdir -p $HOME/.gradle/
-          echo "org.gradle.warning.mode=$WARNING_MODE" >> $HOME/.gradle/gradle.properties
-
-          # Ignore dependency graph files for cleanliness checks (via something JGit listens to)
-          mkdir -p .git/info
-          echo "/dependency-graph-reports/" > .git/info/exclude
+          runtime_version: "${{ inputs.runtime_version }}"
+          publishing_branch_regex: "${{ inputs.publishing_branch_regex }}"
+          gradle_warning_mode: "${{ inputs.gradle_warning_mode }}"
       - name: "run gradle build"
-        uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2.11.1
-        with:
-          dependency-graph: "generate"
-          cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
-          arguments: " ${{ inputs.extra_gradle_params }} build"
+        run: "./gradlew ${{ inputs.extra_gradle_params }} build"
       - name: "archive test results"
         if: "${{ always() }}"
         uses: "actions/upload-artifact@694cdabd8bdb0f10b2cea11669e1bf5453eed0a6" # v4.2.0
@@ -129,7 +101,7 @@ jobs:
             echo "STATUS=release" >> $GITHUB_ENV
           fi
       - name: "publish"
-        if: "${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && steps.branch-name.outputs.match != '' }}"
+        if: "${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && steps.setup.outputs.publishing_branch != '' }}"
         run: "./gradlew ${{ inputs.extra_gradle_params }} publish ${{ inputs.extra_gradle_publish_params }}"
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"

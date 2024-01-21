@@ -1,0 +1,51 @@
+name: "Setup Java Environment"
+description: "Set up the build environment for a Java project"
+
+inputs:
+  runtime_version:
+    description: "The default Java runtime version to run builds on"
+    required: true
+  publishing_branch_regex:
+    description: "The regular expression to determine if a certain branch build should be published"
+    required: true
+  gradle_warning_mode:
+    description: "Warning mode to set on Gradle executions"
+    required: false
+    default: "fail"
+outputs:
+  publishing_branch:
+    description: "The branch name, if it is a publishing branch, or an empty string if not"
+    value: "${{ steps.branch-name.outputs.match }}"
+  
+runs:
+  using: "composite"
+  steps:
+    - name: "checkout"
+      uses: "actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11" # v4.1.1
+      with:
+        fetch-depth: 0
+        submodules: true
+    - name: "jdk ${{ inputs.runtime_version }}"
+      uses: "actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93" # v4.0.0  
+      with:
+        distribution: "temurin"
+        java-version: "${{ inputs.runtime_version }}"
+    - name: "gradle / validate wrapper"
+      uses: "gradle/wrapper-validation-action@56b90f209b02bf6d1deae490e9ef18b21a389cd4" # v1.1.0
+    # Checks branch name to see if we're going to potentially publish this
+    - name: "publishing branch"
+      uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
+      id: "branch-name"
+      with:
+        text: "${{ github.ref }}"
+        regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
+    - name: "gradle / setup properties"
+      env:
+        WARNING_MODE: "${{ inputs.gradle_warning_mode }}"
+      shell: bash
+      run: "${{ github.action_path }}/setup-gradle-properties.sh"
+    - name: "gradle / setup environment"
+      uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2.11.1
+      with:
+        dependency-graph: "generate"
+        cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
