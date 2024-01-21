@@ -1,0 +1,17 @@
+name: "test"
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "setup"
+        uses: "./.github/actions/setup-node-env/"
+      - name: "test"
+        run: "yarn test"
+      - name: "check format"
+        run: "yarn format-check"
+      - name: "lint"
+        run: "yarn lint"

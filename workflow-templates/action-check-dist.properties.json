@@ -1,0 +1,12 @@
+{
+    "name": "Kyori Node Action: Check dist/",
+    "description": "Kyori workflow to check dist/ folder contents",
+    "categories": [
+        "deployment",
+        "JavaScript"
+    ],
+    "filePatterns": [
+        "action.yaml",
+        "action.yml"
+    ]
+}

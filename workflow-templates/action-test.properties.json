@@ -1,0 +1,13 @@
+{
+    "name": "Kyori Node Action: Test",
+    "description": "Kyori workflow to run automated tests on a Node action",
+    "categories": [
+        "testing",
+        "JavaScript"
+    ],
+    "filePatterns": [
+        "action.yaml",
+        "action.yml",
+        "dist/index.js"
+    ]
+}

@@ -1,0 +1,12 @@
+name: "fill in release tags"
+
+
+# When a release tag is pushed (i.e v2.3.0), we can update shortened tags
+on:
+  release:
+    types: [ "released" ]
+
+jobs:
+  fill-tags:
+    uses: "KyoriPowered/.github/.github/workflows/shared-action-fill-in-tags.yaml@trunk"
+    secrets: "inherit"

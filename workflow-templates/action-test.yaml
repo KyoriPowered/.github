@@ -1,0 +1,21 @@
+name: Test
+
+on: push
+
+jobs:
+  test:
+    uses: "KyoriPowered/.github/.github/workflows/shared-action-test.yaml@trunk"
+    secrets: "inherit"
+
+  # change me!
+  functional-test:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: "checkout"
+      uses: "actions/checkout@v4.1.1"
+    - name: "Run functional test"
+      uses: ./
+      id: test-run
+      run: |
+        echo "::error title=Functional test not configured::Test the action here!"
+        exit 1

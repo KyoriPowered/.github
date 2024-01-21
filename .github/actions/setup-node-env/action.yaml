@@ -1,0 +1,23 @@
+name: "Setup Node Environment"
+description: "Set up the build environment for a Node project"
+
+inputs:
+  runtime_version:
+    description: "The default Node runtime version to run builds on"
+    required: false
+    default: "20.x"
+  
+runs:
+  using: "composite"
+  steps:
+    - name: "checkout"
+      uses: "actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11" # v4.1.1
+    - name: "node.js ${{ inputs.runtime_version }}"
+      uses: "actions/setup-node@v4.0.1"
+      with:
+        node-version: "${{ inputs.runtime_version }}"
+        cache: "yarn"
+    - name: "yarn dependencies"
+      shell: "bash"
+      run: "yarn install --immutable"
+

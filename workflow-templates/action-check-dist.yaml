@@ -1,0 +1,17 @@
+name: "Check dist/"
+
+on:
+  push:
+    branches:
+      - trunk
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+  check-dist:
+    uses: "KyoriPowered/.github/.github/workflows/shared-action-check-dist.yaml@trunk"
+    secrets: "inherit"

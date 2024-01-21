@@ -1,0 +1,11 @@
+{
+    "name": "Kyori GH Action: Fill in tags",
+    "description": "Kyori workflow to fill in tags when releasing a GitHub Action",
+    "categories": [
+        "deployment"
+    ],
+    "filePatterns": [
+        "action.yaml",
+        "action.yml"
+    ]
+}
