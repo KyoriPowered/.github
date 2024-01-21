@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: "setup"
-        uses: "./.github/actions/setup-node-env/"
+        uses: "KyoriPowered/.github/.github/actions/setup-node-env@trunk"
       - name: "rebuild the dist/ directory"
         run: "yarn run build"
       - name: "compare the expected and actual dist/ directories"

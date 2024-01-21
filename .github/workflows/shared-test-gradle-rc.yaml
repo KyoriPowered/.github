@@ -40,7 +40,7 @@ jobs:
     steps:
       - name: "setup environment"
         id: "setup"
-        uses: "./.github/actions/setup-java-env/"
+        uses: "KyoriPowered/.github/.github/actions/setup-java-env@trunk"
         with:
           runtime_version: "${{ inputs.runtime_version }}"
           publishing_branch_regex: "__none__"
