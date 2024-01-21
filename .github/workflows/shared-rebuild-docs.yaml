@@ -27,14 +27,14 @@ jobs:
     steps:
       - name: "authenticate"
         id: "authenticate"
-        uses: "tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a" # v2
+        uses: "tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a" # v2.1.0
         with:
           app_id: "${{ secrets.DEPLOYMENT_APP_ID }}"
           installation_retrieval_mode: "id"
           installation_retrieval_payload: "${{ secrets.DOCS_INSTALLATION_ID }}"
           private_key: "${{ secrets.DEPLOYMENT_APP_SECRET }}"
       - name: "Dispatch event"
-        uses: "actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea" # v7
+        uses: "actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea" # v7.0.1
         with:
           github-token: "${{ steps.authenticate.outputs.token }}"
           script: |

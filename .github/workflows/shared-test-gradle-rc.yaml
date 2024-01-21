@@ -39,39 +39,39 @@ jobs:
     runs-on: "${{ matrix.os }}"
     steps:
       - name: "checkout repository"
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
           submodules: true
       - name: "validate gradle wrapper"
-        uses: "gradle/wrapper-validation-action@56b90f209b02bf6d1deae490e9ef18b21a389cd4" # v1
+        uses: "gradle/wrapper-validation-action@56b90f209b02bf6d1deae490e9ef18b21a389cd4" # v1.1.0
       - name: "setup jdk ${{ inputs.runtime_version }}"
-        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4
+        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
         with:
           distribution: "temurin"
           java-version: "${{ inputs.runtime_version }}"
       - name: "determine target version"
-        uses: "KyoriPowered/get-gradle-versions@6a31baddaa856d1877c5c0070e58ba8db82b1389" # v2
+        uses: "KyoriPowered/get-gradle-versions@6a31baddaa856d1877c5c0070e58ba8db82b1389" # v2.0.0
         id: "determine-target"
         with:
           override: "${{ inputs.gradle_version }}"
           output_file: "${{ inputs.injected_version_path }}/injected-gradle-versions"
       - name: "run gradle build / added tests on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2
+        uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2.11.1
         if: "${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
           arguments: "${{ inputs.extra_gradle_params }} build"
       - name: "archive test results"
         if: "${{ always() }}"
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
           name: "${{ runner.os }}-test-results"
           path: |
             build/reports/
             */build/reports/
       - name: "run gradle build / compiling on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
-        uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2
+        uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2.11.1
         if: "${{ always() && steps.determine-target.outputs.latest_rc_or_nightly }}"
         with:
           cache-read-only: true
