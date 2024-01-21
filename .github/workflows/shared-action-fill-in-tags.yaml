@@ -9,10 +9,10 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "checkout"
-        uses: "actions/checkout@v4.1.1"
+        uses: "actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11" # v4.1.1
       - name: "create tag parts"
         id: match
-        uses: "KyoriPowered/action-regex-match@v4.0.0"
+        uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
         with:
           text: ${{ github.event.release.tag_name }}
           regex: 'v((\d+)\.(\d+)\.(\d+))'
