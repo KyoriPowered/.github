@@ -16,7 +16,7 @@ outputs:
   publishing_branch:
     description: "The branch name, if it is a publishing branch, or an empty string if not"
     value: "${{ steps.branch-name.outputs.match }}"
-  
+
 runs:
   using: "composite"
   steps:
@@ -26,7 +26,7 @@ runs:
         fetch-depth: 0
         submodules: true
     - name: "jdk ${{ inputs.runtime_version }}"
-      uses: "actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93" # v4.0.0  
+      uses: "actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93" # v4.0.0
       with:
         distribution: "zulu"
         java-version: "${{ inputs.runtime_version }}"
@@ -43,7 +43,8 @@ runs:
       env:
         WARNING_MODE: "${{ inputs.gradle_warning_mode }}"
       shell: bash
-      run: "${{ github.action_path }}/setup-gradle-properties.sh"
+      run: |
+        exec "$GITHUB_ACTION_PATH/setup-gradle-properties.sh"
     - name: "gradle / setup environment"
       uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2.11.1
       with:
