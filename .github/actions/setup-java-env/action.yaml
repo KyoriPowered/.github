@@ -46,7 +46,7 @@ runs:
       run: |
         exec "$GITHUB_ACTION_PATH/setup-gradle-properties.sh"
     - name: "gradle / setup environment"
-      uses: "gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2" # v2.11.1
+      uses: "gradle/gradle-build-action@a8f75513eafdebd8141bd1cd4e30fcd194af8dfa" # v2.12.0
       with:
         dependency-graph: "generate"
         cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
