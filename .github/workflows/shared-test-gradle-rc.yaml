@@ -64,6 +64,7 @@ jobs:
             */build/reports/
       - name: "run gradle build / compiling on ${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
         if: "${{ always() && steps.determine-target.outputs.latest_rc_or_nightly }}"
+        shell: "bash"
         env:
           GRADLE_VERSION: "${{ steps.determine-target.outputs.latest_rc_or_nightly }}"
           EXTRA_GRADLE_PARAMS: "${{ inputs.extra_gradle_params }}"
