@@ -82,7 +82,7 @@ jobs:
         run: "./gradlew ${{ inputs.extra_gradle_params }} build"
       - name: "archive test results"
         if: "${{ always() }}"
-        uses: "actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8" # v4.3.0
+        uses: "actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3" # v4.3.1
         with:
           name: "${{ runner.os }}-test-results"
           path: |
@@ -128,7 +128,7 @@ jobs:
           text: "${{ github.ref }}"
           regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
       - name: "submit dependency graph"
-        uses: "gradle/gradle-build-action@3b1b3b9a2104c2b47fbae53f3938079c00c9bb87" # v3.0.0
+        uses: "gradle/gradle-build-action@29c0906b64b8fc82467890bfb7a0a7ef34bda89e" # v3.1.0
         if: steps.branch-name.outputs.match != ''
         with:
           dependency-graph: "download-and-submit"
