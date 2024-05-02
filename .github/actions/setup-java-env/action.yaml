@@ -31,7 +31,7 @@ runs:
         distribution: "zulu"
         java-version: "${{ inputs.runtime_version }}"
     - name: "gradle / validate wrapper"
-      uses: "gradle/wrapper-validation-action@b231772637bb498f11fdbc86052b6e8a8dc9fc92" # v2.1.2
+      uses: "gradle/wrapper-validation-action@216d1ad2b3710bf005dc39237337b9673fd8fcd5" # v3.3.2
     # Checks branch name to see if we're going to potentially publish this
     - name: "publishing branch"
       uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
