@@ -9,7 +9,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "checkout"
-        uses: "actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11" # v4.1.1
+        uses: "actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b" # v4.1.4
       - name: "create tag parts"
         id: match
         uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
