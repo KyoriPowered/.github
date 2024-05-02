@@ -21,7 +21,7 @@ runs:
   using: "composite"
   steps:
     - name: "checkout"
-      uses: "actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11" # v4.1.1
+      uses: "actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b" # v4.1.4
       with:
         fetch-depth: 0
         submodules: true
@@ -46,7 +46,7 @@ runs:
       run: |
         exec "$GITHUB_ACTION_PATH/setup-gradle-properties.sh"
     - name: "gradle / setup environment"
-      uses: "gradle/gradle-build-action@29c0906b64b8fc82467890bfb7a0a7ef34bda89e" # v3.1.0
+      uses: "gradle/gradle-build-action@4c39dd82cd5e1ec7c6fa0173bb41b4b6bb3b86ff" # v3.3.2
       with:
         dependency-graph: "generate"
         cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
