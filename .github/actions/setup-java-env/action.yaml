@@ -21,7 +21,7 @@ runs:
   using: "composite"
   steps:
     - name: "checkout"
-      uses: "actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29" # v4.1.6
+      uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
       with:
         fetch-depth: 0
         submodules: true
@@ -31,7 +31,7 @@ runs:
         distribution: "zulu"
         java-version: "${{ inputs.runtime_version }}"
     - name: "gradle / validate wrapper"
-      uses: "gradle/actions/wrapper-validation@db19848a5fa7950289d3668fb053140cf3028d43" # v3.3.2
+      uses: "gradle/actions/wrapper-validation@d9c87d481d55275bb5441eef3fe0e46805f9ef70" # v3.5.0
     # Checks branch name to see if we're going to potentially publish this
     - name: "publishing branch"
       uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
@@ -46,7 +46,7 @@ runs:
       run: |
         exec "$GITHUB_ACTION_PATH/setup-gradle-properties.sh"
     - name: "gradle / setup environment"
-      uses: "gradle/actions/setup-gradle@db19848a5fa7950289d3668fb053140cf3028d43" # v3.3.2
+      uses: "gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70" # v3.5.0
       with:
         dependency-graph: "generate"
         cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
