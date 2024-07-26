@@ -7,7 +7,7 @@ on:
         description: 'The default Java runtime version to run builds on'
         required: false
         type: number
-        default: 11
+        default: 17
       injected_version_path:
         description: 'The path to write an injected versions resource (named: injected-gradle-versions) to'
         required: true

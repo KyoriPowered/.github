@@ -7,7 +7,7 @@ on:
         description: 'The default Java runtime version to run builds on'
         required: false
         type: number
-        default: 11
+        default: 17
       publishing_branch_regex:
         description: 'The regular expression to determine if a certain branch build should be published'
         required: false
