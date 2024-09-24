@@ -49,4 +49,4 @@ runs:
       uses: "gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707" # v4.0.1
       with:
         dependency-graph: "generate-and-upload"
-        cache-read-only: "${{ steps.branch-name.outputs.match == '' || github.event_name == 'pull_request' }}"
+        cache-read-only: "${{ (steps.branch-name.outputs.match == '' || github.event_name == 'pull_request') && !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}"
