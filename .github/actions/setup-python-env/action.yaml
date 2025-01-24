@@ -1,0 +1,23 @@
+name: "Setup Python Environment - Poetry"
+description: "Set up the build environment for a Python project with Poetry"
+
+inputs:
+  runtime_version:
+    description: "The default Python runtime version to run builds on"
+    required: false
+    default: "3.13.x"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "checkout repository"
+      uses: "actions/checkout@v4.2.2"
+    - name: "setup python ${{ inputs.runtime_version }}"
+      uses: "actions/setup-python@v5.3.0"
+      with:
+        python-version: "${{ inputs.runtime_version }}"
+        cache: "poetry"
+    - name: "install poetry"
+      shell: "bash"
+      run: |
+        pip install -U poetry
