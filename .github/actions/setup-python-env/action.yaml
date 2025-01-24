@@ -6,6 +6,15 @@ inputs:
     description: "The default Python runtime version to run builds on"
     required: false
     default: "3.13.x"
+  publishing_branch_regex:
+    description: "The regular expression to determine if a certain branch build should be published"
+    required: false
+    default: '(?:(?:(?:main\/)?(\d+(?:\.\d+)*(?:\.x)?)))|master|main|trunk'
+
+outputs:
+  publishing_branch:
+    description: "The branch name, if it is a publishing branch, or an empty string if not"
+    value: "${{ steps.branch-name.outputs.match }}"
 
 runs:
   using: "composite"
@@ -17,6 +26,13 @@ runs:
       with:
         python-version: "${{ inputs.runtime_version }}"
         cache: "poetry"
+    # Checks branch name to see if we're going to potentially publish this
+    - name: "publishing branch"
+      uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
+      id: "branch-name"
+      with:
+        text: "${{ github.ref }}"
+        regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
     - name: "install poetry"
       shell: "bash"
       run: |
