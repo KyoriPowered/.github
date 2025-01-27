@@ -2,7 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Standard preset across Kyori repositories",
   "extends": [
-    "config:base"
+    "config:base",
+    "docker:pinDigests"
   ],
   "labels": [
     "type: dependencies"
@@ -52,6 +53,13 @@
       "groupName": "gradle and github actions"
     }
   ],
+  "pinDigest": {
+    "schedule": [
+      "at any time"
+    ],
+    "automerge": true,
+    "automergeType": "pr"
+  },
   "prHourlyLimit": 4,
   "semanticCommitType": "build",
   "commitMessagePrefix": "chore(deps): "
