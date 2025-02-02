@@ -60,6 +60,9 @@
     "automerge": true,
     "automergeType": "pr"
   },
+  "pre-commit": {
+    "enabled": true
+  },
   "prHourlyLimit": 4,
   "semanticCommitType": "build",
   "commitMessagePrefix": "chore(deps): "
