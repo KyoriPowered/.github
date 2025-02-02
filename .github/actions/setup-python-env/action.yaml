@@ -10,6 +10,15 @@ inputs:
     description: "The regular expression to determine if a certain branch build should be published"
     required: false
     default: '(?:(?:(?:main\/)?(\d+(?:\.\d+)*(?:\.x)?)))|master|main|trunk'
+  working_dir:
+    description: "The directory containing the poetry project to setup"
+    required: false
+    default: "${{ github.workspace }}"
+  activate_venv:
+    description: "Whether to install dependencies and activate the poetry virtual environment for this project"
+    required: false
+    default: "false"
+
 
 outputs:
   publishing_branch:
@@ -36,3 +45,12 @@ runs:
       with:
         text: "${{ github.ref }}"
         regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
+    - name: "poetry / install and activate environment"
+      if: "${{ inputs.activate_venv }}"
+      shell: "bash"
+      working-directory: "${{ inputs.working_dir }}"
+      run: |
+        poetry sync
+        VIRTUAL_ENV=$(poetry env info --path)
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> "$GITHUB_ENV"
+        echo "$VIRTUAL_ENV/bin" > "$GITHUB_PATH"
