@@ -26,12 +26,12 @@ runs:
         fetch-depth: 0
         submodules: true
     - name: "jdk ${{ inputs.runtime_version }}"
-      uses: "actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12" # v4.7.0
+      uses: "actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00" # v4.7.1
       with:
         distribution: "zulu"
         java-version: "${{ inputs.runtime_version }}"
     - name: "gradle / validate wrapper"
-      uses: "gradle/actions/wrapper-validation@06832c7b30a0129d7fb559bcc6e43d26f6374244" # v4.3.1
+      uses: "gradle/actions/wrapper-validation@8379f6a1328ee0e06e2bb424dadb7b159856a326" # v4.4.0
     # Checks branch name to see if we're going to potentially publish this
     - name: "publishing branch"
       uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
@@ -46,7 +46,7 @@ runs:
       run: |
         exec "$GITHUB_ACTION_PATH/setup-gradle-properties.sh"
     - name: "gradle / setup environment"
-      uses: "gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244" # v4.3.1
+      uses: "gradle/actions/setup-gradle@8379f6a1328ee0e06e2bb424dadb7b159856a326" # v4.4.0
       with:
         dependency-graph: "generate-and-upload"
         cache-read-only: "${{ (steps.branch-name.outputs.match == '' || github.event_name == 'pull_request') && !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}"
