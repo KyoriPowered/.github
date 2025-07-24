@@ -28,6 +28,21 @@ on:
         required: false
         type: string
         default: 'fail'
+      central_release_publishing:
+        description: 'Whether to publish to Maven Central on release'
+        required: false
+        type: boolean
+        default: false
+      publish_release_javadoc:
+        description: 'Whether to publish Javadocs on release'
+        required: false
+        type: boolean
+        default: false
+      javadoc_deploy_prefix:
+        description: 'Extra subdirectory to publish javadoc under'
+        required: false
+        type: string
+        default: ''
     secrets:
       SONATYPE_USERNAME:
         description: 'Kyori OSSRH Username'
@@ -58,6 +73,12 @@ on:
         required: false
       KYORI_GPG_PASSWORD:
         description: 'Kyori GPG signing password'
+        required: false
+      JAVADOC_PUBLISH_APP_ID:
+        description: 'App id for JD publisher'
+        required: false
+      JAVADOC_PUBLISH_APP_KEY:
+        description: 'App key for JD publisher'
         required: false
 
 concurrency:
@@ -106,7 +127,7 @@ jobs:
           else
             echo "STATUS=release" >> $GITHUB_ENV
           fi
-      - name: "publish"
+      - name: "publish snapshot"
         if: "${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && steps.setup.outputs.publishing_branch != '' }}"
         run: "./gradlew ${{ inputs.extra_gradle_params }} publish ${{ inputs.extra_gradle_publish_params }}"
         env:
@@ -120,6 +141,41 @@ jobs:
           ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
           ORG_GRADLE_PROJECT_kyoriUsername: "${{ secrets.KYORI_REPO_USERNAME }}"
           ORG_GRADLE_PROJECT_kyoriPassword: "${{ secrets.KYORI_REPO_PASSWORD }}"
+      - name: "publish release to maven central"
+        if: "${{ inputs.central_release_publishing && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
+        run: "./gradlew ${{ inputs.extra_gradle_params }} publishToSonatype closeAndReleaseSonatypeStagingRepository ${{ inputs.extra_gradle_publish_params }}"
+        env:
+          ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
+          ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
+          ORG_GRADLE_PROJECT_kyoriSigningKey: "${{ secrets.KYORI_GPG_KEY }}"
+          ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
+      - name: "copy javadoc for publication"
+        if: "${{ inputs.publish_release_javadoc && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
+        run: |
+          mkdir -p build/publish-jd/${{ inputs.javadoc_deploy_prefix }}
+          ./gradlew ${{ inputs.extra_gradle_params }} copyJavadoc --output build/publish-jd/${{ inputs.javadoc_deploy_prefix }}
+      - name: "authenticate for javadoc publication"
+        if: "${{ inputs.publish_release_javadoc && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
+        uses: "tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a" # v2.1.0
+        id: jd-token
+        with:
+          app_id: "${{ secrets.JAVADOC_PUBLISH_APP_ID }}"
+          private_key: "${{ secrets.JAVADOC_PUBLISH_APP_KEY }}"
+          installation_retrieval_mode: "repository"
+          installation_retrieval_payload: "KyoriPowered/adventure-javadocs"
+      - name: "publish javadoc"
+        if: "${{ inputs.publish_release_javadoc && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
+        uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8 # v4.7.3
+        with:
+          folder: build/publish-jd
+          repository-name: KyoriPowered/adventure-javadocs
+          token: ${{ steps.jd-token.outputs.token }}
+          branch: data
+          git-config-name: spongie-jd[bot] # TODO
+          git-config-email: "167721471+spongie-jd[bot]@users.noreply.github.com" # TODO
+          clean: false
+          force: false
+          commit-message: "Publishing javadoc for ${{ github.repository }} ${{ env.PROJECT_VERSION }}"
   upload-dependencies:
     name: "submit dependency graph"
     # try to run on build failure too?
