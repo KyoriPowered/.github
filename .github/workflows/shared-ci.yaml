@@ -183,7 +183,7 @@ jobs:
           folder: build/publish-jd
           repository-name: KyoriPowered/adventure-javadocs
           token: ${{ steps.jd-token.outputs.token }}
-          branch: data
+          branch: main
           git-config-name: kyoripowered-deployment[bot]
           git-config-email: "121842021+kyoripowered-deployment[bot]@users.noreply.github.com"
           clean: false
