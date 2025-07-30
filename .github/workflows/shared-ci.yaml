@@ -23,13 +23,18 @@ on:
         required: false
         type: string
         default: ''
+      gradle_release_publish_tasks:
+        description: 'Extra tasks to pass to the Gradle invocation that publishes releases of this project'
+        required: false
+        type: string
+        default: 'publishToSonatype closeAndReleaseSonatypeStagingRepository'
       gradle_warning_mode:
         description: 'Warning mode to set on Gradle executions'
         required: false
         type: string
         default: 'fail'
-      central_release_publishing:
-        description: 'Whether to publish to Maven Central on release'
+      publish_releases:
+        description: 'Whether to publish releases of this project. The gradle_release_publish_params input must be provided when publishing to anything but Sonatype Central'
         required: false
         type: boolean
         default: false
@@ -79,6 +84,12 @@ on:
         required: false
       DEPLOYMENT_APP_SECRET:
         description: 'App key for JD publisher'
+        required: false
+      KYORI_PLUGIN_PORTAL_API_KEY:
+        description: 'Kyori Gradle Plugin Portal API key'
+        required: false
+      KYORI_PLUGIN_PORTAL_API_SECRET:
+        description: 'Kyori Gradle Plugin Portal API secret'
         required: false
 
 concurrency:
@@ -141,14 +152,16 @@ jobs:
           ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
           ORG_GRADLE_PROJECT_kyoriUsername: "${{ secrets.KYORI_REPO_USERNAME }}"
           ORG_GRADLE_PROJECT_kyoriPassword: "${{ secrets.KYORI_REPO_PASSWORD }}"
-      - name: "publish release to maven central"
-        if: "${{ inputs.central_release_publishing && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
-        run: "./gradlew ${{ inputs.extra_gradle_params }} publishToSonatype closeAndReleaseSonatypeStagingRepository ${{ inputs.extra_gradle_publish_params }}"
+      - name: "publish release"
+        if: "${{ inputs.publish_releases && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
+        run: "./gradlew ${{ inputs.extra_gradle_params }} ${{ inputs.gradle_release_publish_tasks }} ${{ inputs.extra_gradle_publish_params }}"
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
           ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
           ORG_GRADLE_PROJECT_kyoriSigningKey: "${{ secrets.KYORI_GPG_KEY }}"
           ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
+          ORG_GRADLE_PROJECT_pluginPortalApiKey: "${{ secrets.KYORI_PLUGIN_PORTAL_KEY }}"
+          ORG_GRADLE_PROJECT_pluginPortalApiSecret: "${{ secrets.KYORI_PLUGIN_PORTAL_SECRET }}"
       - name: "copy javadoc for publication"
         if: "${{ inputs.publish_release_javadoc && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
         run: |
