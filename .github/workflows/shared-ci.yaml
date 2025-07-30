@@ -74,10 +74,10 @@ on:
       KYORI_GPG_PASSWORD:
         description: 'Kyori GPG signing password'
         required: false
-      JAVADOC_PUBLISH_APP_ID:
+      DEPLOYMENT_APP_ID:
         description: 'App id for JD publisher'
         required: false
-      JAVADOC_PUBLISH_APP_KEY:
+      DEPLOYMENT_APP_SECRET:
         description: 'App key for JD publisher'
         required: false
 
@@ -159,8 +159,8 @@ jobs:
         uses: "tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a" # v2.1.0
         id: jd-token
         with:
-          app_id: "${{ secrets.JAVADOC_PUBLISH_APP_ID }}"
-          private_key: "${{ secrets.JAVADOC_PUBLISH_APP_KEY }}"
+          app_id: "${{ secrets.DEPLOYMENT_APP_ID }}"
+          private_key: "${{ secrets.DEPLOYMENT_APP_SECRET }}"
           installation_retrieval_mode: "repository"
           installation_retrieval_payload: "KyoriPowered/adventure-javadocs"
       - name: "publish javadoc"
@@ -171,8 +171,8 @@ jobs:
           repository-name: KyoriPowered/adventure-javadocs
           token: ${{ steps.jd-token.outputs.token }}
           branch: data
-          git-config-name: spongie-jd[bot] # TODO
-          git-config-email: "167721471+spongie-jd[bot]@users.noreply.github.com" # TODO
+          git-config-name: kyoripowered-deployment[bot]
+          git-config-email: "121842021+kyoripowered-deployment[bot]@users.noreply.github.com"
           clean: false
           force: false
           commit-message: "Publishing javadoc for ${{ github.repository }} ${{ env.PROJECT_VERSION }}"
