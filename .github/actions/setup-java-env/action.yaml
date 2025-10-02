@@ -21,7 +21,7 @@ runs:
   using: "composite"
   steps:
     - name: "checkout"
-      uses: "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683" # v4.2.2
+      uses: "actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955" # v4.3.0
       with:
         fetch-depth: 0
         submodules: true
@@ -44,7 +44,7 @@ runs:
       run: |
         exec "$GITHUB_ACTION_PATH/setup-gradle-properties.sh"
     - name: "gradle / setup environment"
-      uses: "gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96" # v4.4.1
+      uses: "gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1" # v4.4.4
       with:
         dependency-graph: "generate-and-upload"
         cache-read-only: "${{ (steps.branch-name.outputs.match == '' || github.event_name == 'pull_request') && !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}"
