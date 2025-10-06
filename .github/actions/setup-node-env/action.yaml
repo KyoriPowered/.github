@@ -5,8 +5,8 @@ inputs:
   runtime_version:
     description: "The default Node runtime version to run builds on"
     required: false
-    default: "20.x"
-  
+    default: "24.x"
+
 runs:
   using: "composite"
   steps:
