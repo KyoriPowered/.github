@@ -92,122 +92,37 @@ on:
         description: 'Kyori Gradle Plugin Portal API secret'
         required: false
 
-concurrency:
-  group: "${{ github.workflow }}-${{ github.event.number || github.ref }}"
-  cancel-in-progress: true
-
 permissions:
   actions: "write"
-  contents: "read"
+  contents: "write"
   id-token: "write"
 
 jobs:
-  build:
-    # Only run on PRs if the source branch is on someone else's repo
-    if: "${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}"
-    strategy:
-      matrix:
-        os: ["ubuntu-latest", "windows-latest"]
-    runs-on: "${{ matrix.os }}"
-    steps:
-      - name: "setup environment"
-        id: "setup"
-        uses: "KyoriPowered/.github/.github/actions/setup-java-env@trunk"
-        with:
-          runtime_version: "${{ inputs.runtime_version }}"
-          publishing_branch_regex: "${{ inputs.publishing_branch_regex }}"
-          gradle_warning_mode: "${{ inputs.gradle_warning_mode }}"
-      - name: "run gradle build"
-        run: "./gradlew ${{ inputs.extra_gradle_params }} build"
-      - name: "archive test results"
-        if: "${{ always() }}"
-        uses: "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02" # v4.6.2
-        with:
-          name: "${{ runner.os }}-test-results"
-          path: |
-            build/reports/
-            */build/reports/
-      - name: "determine status & prepare for publish"
-        if: "${{ runner.os == 'Linux' }}"
-        run: |
-          # Disable dependency graph generation after first build, plus for this step itself
-          echo "GITHUB_DEPENDENCY_GRAPH_ENABLED=false" >> $GITHUB_ENV
-          export GITHUB_DEPENDENCY_GRAPH_ENABLED=false
-
-          if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
-            echo "STATUS=snapshot" >> $GITHUB_ENV
-          else
-            echo "STATUS=release" >> $GITHUB_ENV
-          fi
-      - name: "publish snapshot"
-        if: "${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && steps.setup.outputs.publishing_branch != '' }}"
-        run: "./gradlew ${{ inputs.extra_gradle_params }} publish ${{ inputs.extra_gradle_publish_params }}"
-        env:
-          ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
-          ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
-          ORG_GRADLE_PROJECT_stellardriftUsername: "${{ secrets.STELLARDRIFT_USERNAME }}"
-          ORG_GRADLE_PROJECT_stellardriftPassword: "${{ secrets.STELLARDRIFT_PASSWORD }}"
-          ORG_GRADLE_PROJECT_papermcUsername: "${{ secrets.PAPERMC_USERNAME }}"
-          ORG_GRADLE_PROJECT_papermcPassword: "${{ secrets.PAPERMC_PASSWORD }}"
-          ORG_GRADLE_PROJECT_kyoriSigningKey: "${{ secrets.KYORI_GPG_KEY }}"
-          ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
-          ORG_GRADLE_PROJECT_kyoriUsername: "${{ secrets.KYORI_REPO_USERNAME }}"
-          ORG_GRADLE_PROJECT_kyoriPassword: "${{ secrets.KYORI_REPO_PASSWORD }}"
-      - name: "publish release"
-        if: "${{ inputs.publish_releases && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
-        run: "./gradlew ${{ inputs.extra_gradle_params }} ${{ inputs.gradle_release_publish_tasks }} ${{ inputs.extra_gradle_publish_params }}"
-        env:
-          ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
-          ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
-          ORG_GRADLE_PROJECT_kyoriSigningKey: "${{ secrets.KYORI_GPG_KEY }}"
-          ORG_GRADLE_PROJECT_kyoriSigningPassword: "${{ secrets.KYORI_GPG_PASSWORD }}"
-          ORG_GRADLE_PROJECT_pluginPortalApiKey: "${{ secrets.KYORI_PLUGIN_PORTAL_KEY }}"
-          ORG_GRADLE_PROJECT_pluginPortalApiSecret: "${{ secrets.KYORI_PLUGIN_PORTAL_SECRET }}"
-      - name: "copy javadoc for publication"
-        if: "${{ inputs.publish_release_javadoc && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
-        run: |
-          mkdir -p build/publish-jd/${{ inputs.javadoc_deploy_prefix }}
-          ./gradlew ${{ inputs.extra_gradle_params }} copyJavadoc --output build/publish-jd/${{ inputs.javadoc_deploy_prefix }}
-      - name: "authenticate for javadoc publication"
-        if: "${{ inputs.publish_release_javadoc && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
-        uses: "tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a" # v2.1.0
-        id: jd-token
-        with:
-          app_id: "${{ secrets.DEPLOYMENT_APP_ID }}"
-          private_key: "${{ secrets.DEPLOYMENT_APP_SECRET }}"
-          installation_retrieval_mode: "repository"
-          installation_retrieval_payload: "KyoriPowered/adventure-javadocs"
-      - name: "publish javadoc"
-        if: "${{ inputs.publish_release_javadoc && runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'release' }}"
-        uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8 # v4.7.3
-        with:
-          folder: build/publish-jd
-          repository-name: KyoriPowered/adventure-javadocs
-          token: ${{ steps.jd-token.outputs.token }}
-          branch: main
-          git-config-name: kyoripowered-deployment[bot]
-          git-config-email: "121842021+kyoripowered-deployment[bot]@users.noreply.github.com"
-          clean: false
-          force: false
-          commit-message: "Publishing javadoc for ${{ github.repository }} ${{ env.PROJECT_VERSION }}"
-  upload-dependencies:
-    name: "submit dependency graph"
-    # try to run on build failure too?
-    if: github.event_name == 'push' && always()
-    needs: "build"
-    runs-on: "ubuntu-latest"
-    permissions:
-      contents: "write"
-    steps:
-      - name: "check branch for publish"
-        uses: "KyoriPowered/action-regex-match@1ff8ef914f6762fff8d5efd8d56ef88b5be5dd5c" # v4.0.0
-        id: "branch-name"
-        with:
-          text: "${{ github.ref }}"
-          regex: "^refs/heads/(?:${{ inputs.publishing_branch_regex }})$" # master or something like 0.8.x or 2.x
-      - name: "submit dependency graph"
-        uses: "gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2" # v5.0.0
-        if: steps.branch-name.outputs.match != ''
-        with:
-          dependency-graph: "download-and-submit"
-
+  call-build:
+    uses: "KyoriPowered/ci-cookbook/.github/workflows/java-ci.yaml@2025.10.17"
+    with:
+      runtime_version: "${{ inputs.runtime_version }}"
+      publishing_branch_regex: "${{ inputs.publishing_branch_regex }}"
+      extra_gradle_params: "${{ inputs.extra_gradle_params }}"
+      extra_gradle_publish_params: "${{ inputs.extra_gradle_publish_params }}"
+      gradle_release_publish_tasks: "${{ inputs.gradle_release_publish_tasks }}"
+      gradle_warning_mode: "${{ inputs.gradle_warning_mode }}"
+      publish_releases: "${{ inputs.publish_releases }}"
+      publish_release_javadoc: "${{ inputs.publish_release_javadoc }}"
+      javadoc_deploy_prefix: "${{ inputs.javadoc_deploy_prefix }}"
+    secrets:
+      DEPLOYMENT_APP_ID: "${{ secrets.DEPLOYMENT_APP_ID }}"
+      DEPLOYMENT_APP_SECRET: "${{ secrets.DEPLOYMENT_APP_SECRET }}"
+      publishing_env_vars: |
+          ORG_GRADLE_PROJECT_sonatypeUsername="${{ secrets.SONATYPE_USERNAME }}"
+          ORG_GRADLE_PROJECT_sonatypePassword="${{ secrets.SONATYPE_PASSWORD }}"
+          ORG_GRADLE_PROJECT_stellardriftUsername="${{ secrets.STELLARDRIFT_USERNAME }}"
+          ORG_GRADLE_PROJECT_stellardriftPassword="${{ secrets.STELLARDRIFT_PASSWORD }}"
+          ORG_GRADLE_PROJECT_papermcUsername="${{ secrets.PAPERMC_USERNAME }}"
+          ORG_GRADLE_PROJECT_papermcPassword="${{ secrets.PAPERMC_PASSWORD }}"
+          ORG_GRADLE_PROJECT_kyoriSigningKey="${{ secrets.KYORI_GPG_KEY }}"
+          ORG_GRADLE_PROJECT_kyoriSigningPassword="${{ secrets.KYORI_GPG_PASSWORD }}"
+          ORG_GRADLE_PROJECT_kyoriUsername="${{ secrets.KYORI_REPO_USERNAME }}"
+          ORG_GRADLE_PROJECT_kyoriPassword="${{ secrets.KYORI_REPO_PASSWORD }}"
+          ORG_GRADLE_PROJECT_pluginPortalApiKey="${{ secrets.KYORI_PLUGIN_PORTAL_KEY }}"
+          ORG_GRADLE_PROJECT_pluginPortalApiSecret="${{ secrets.KYORI_PLUGIN_PORTAL_SECRET }}"
