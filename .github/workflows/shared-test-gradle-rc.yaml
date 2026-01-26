@@ -46,7 +46,7 @@ jobs:
           publishing_branch_regex: "__none__"
           gradle_warning_mode: "fail"
       - name: "determine target version"
-        uses: "KyoriPowered/get-gradle-versions@6a31baddaa856d1877c5c0070e58ba8db82b1389" # v2.0.0
+        uses: "KyoriPowered/get-gradle-versions@a463abd135fb9c78b50140cd148b049459892723" # v3.0.0
         id: "determine-target"
         with:
           override: "${{ inputs.gradle_version }}"
@@ -56,7 +56,7 @@ jobs:
         run: "./gradlew ${{ inputs.extra_gradle_params }} build"
       - name: "archive test results"
         if: "${{ always() }}"
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: "${{ runner.os }}-test-results"
           path: |
