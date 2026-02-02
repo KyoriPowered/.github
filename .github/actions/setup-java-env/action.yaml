@@ -44,7 +44,7 @@ runs:
       run: |
         exec "$GITHUB_ACTION_PATH/setup-gradle-properties.sh"
     - name: "gradle / setup environment"
-      uses: "gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2" # v5.0.0
+      uses: "gradle/actions/setup-gradle@f29f5a9d7b09a7c6b29859002d29d24e1674c884" # v5.0.1
       with:
         dependency-graph: "generate-and-upload"
         cache-read-only: "${{ (steps.branch-name.outputs.match == '' || github.event_name == 'pull_request') && !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') }}"
