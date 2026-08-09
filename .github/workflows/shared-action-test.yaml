@@ -8,7 +8,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "setup"
-        uses: "KyoriPowered/.github/.github/actions/setup-node-env@trunk"
+        uses: "KyoriPowered/.github/.github/actions/setup-node-env@7b79b090212a9c8e371b71c23f5e7b097d125997" # trunk
       - name: "test"
         run: "yarn test"
       - name: "check format"
