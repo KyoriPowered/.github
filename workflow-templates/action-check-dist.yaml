@@ -13,5 +13,5 @@ on:
 
 jobs:
   check-dist:
-    uses: "KyoriPowered/.github/.github/workflows/shared-action-check-dist.yaml@trunk"
+    uses: "KyoriPowered/.github/.github/workflows/shared-action-check-dist.yaml@7b79b090212a9c8e371b71c23f5e7b097d125997" # trunk
     secrets: "inherit"
