@@ -7,5 +7,5 @@ on:
 
 jobs:
   call-build:
-    uses: "KyoriPowered/.github/.github/workflows/shared-rebuild-docs.yaml@trunk"
+    uses: "KyoriPowered/.github/.github/workflows/shared-rebuild-docs.yaml@7b79b090212a9c8e371b71c23f5e7b097d125997" # trunk
     secrets: "inherit"
