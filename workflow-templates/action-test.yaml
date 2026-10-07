@@ -4,7 +4,7 @@ on: push
 
 jobs:
   test:
-    uses: "KyoriPowered/.github/.github/workflows/shared-action-test.yaml@trunk"
+    uses: "KyoriPowered/.github/.github/workflows/shared-action-test.yaml@7b79b090212a9c8e371b71c23f5e7b097d125997" # trunk
     secrets: "inherit"
 
   # change me!
@@ -12,7 +12,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
     - name: "checkout"
-      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6.0.2
+      uses: "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803" # v6.1.0
     - name: "Run functional test"
       uses: ./
       id: test-run
